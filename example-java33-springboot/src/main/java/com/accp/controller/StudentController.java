@@ -11,6 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.accp.domain.Student;
 import com.accp.service.StudentService;
 
+/**
+ * 
+ * 这是我的功能功能
+ * 
+ * 
+ * @author admin
+ *
+ */
 @Controller
 @RequestMapping("/student")
 public class StudentController {
