@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link th:href="@{/css/bootstrap.min.css}"  rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<h1>查詢頁面</h1>
+	
+	<div id="ctx">
+		<span @click="openModal">添加</span>
+		<span @click="remove">删除</span>
+		<table class="table">
+			<tr>
+				<td><input v-model="checkValue" type="checkbox">编号</td>
+				<td>姓名</td>
+				<td>年龄</td>
+				<td>班级</td>
+				<td>操作</td>
+			</tr>
+			<tr v-for="item in page.list">
+				<td><input v-model="checkList" :value="item.id" type="checkbox"> {{item.id}}</td>
+				<td>{{item.name}}</td>
+				<td>{{item.age}}</td>
+				<td>{{item.clz.name}}</td>
+				<td>
+					<!-- 修改班级 -->
+					<span @click="toEdit(item.cid)">
+						修改
+					</span>
+				</td>
+			</tr>
+		</table>
+		<div id="pageMenu">
+			<span @click="goPage(1)">首页</span>
+			<span @click="goPage(page.prePage)">上一页</span>
+			<span @click="goPage(page.nextPage)">下一页</span>
+			<span @click="goPage(page.pages)">尾页</span>
+		</div>
+		
+		<div id="createModal" class="modal">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3>班级添加</h3>
+						</div>
+						<div class="modal-body">
+							<div class="form-horizontal">
+								<div class="form-group">
+									<label class="col-xs-2 control-label">班级名称：</label>
+									<div class="col-xs-10">
+										<input v-model="clz.name" class="form-control">
+									</div>
+								</div>
+							</div>
+							<div class="form-inline">
+									<p>学生信息<button @click="createStu" class="btn btn-default">增加</button></p>
+									<div v-for="stu in slist">
+										<div class="form-group">
+											<label class="control-label">名称：</label>
+											<input v-model="stu.name" class="form-control">
+										</div>
+										<div class="form-group">
+											<label class="control-label">年龄：</label>
+											<input v-model="stu.age" class="form-control">
+										</div>
+										<div class="form-group">
+											<label class="control-label">生日：</label>
+											<input type="date" v-model="stu.birthday" class="form-control">
+										</div>
+									</div>
+								</div>
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-danger" @click="closeModal('editModal')">关闭</button>
+							<button class="btn btn-primary" @click="save()">保存</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div id="editModal" class="modal">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3>班级修改</h3>
+						</div>
+						<div class="modal-body">
+							<div class="form-horizontal">
+								<div class="form-group">
+									<label class="col-xs-2 control-label">班级名称：</label>
+									<div class="col-xs-10">
+										<input v-model="clz.name" class="form-control">
+									</div>
+								</div>
+							</div>
+							<div class="form-inline">
+									<p>学生信息<button @click="createStu" class="btn btn-default">增加</button></p>
+									<div v-for="stu in slist">
+										<div class="form-group">
+											<label class="control-label">名称：</label>
+											<input v-model="stu.name" class="form-control">
+										</div>
+										<div class="form-group">
+											<label class="control-label">年龄：</label>
+											<input v-model="stu.age" class="form-control">
+										</div>
+										<div class="form-group">
+											<label class="control-label">生日：</label>
+											<input type="date" v-model="stu.birthday" class="form-control">
+										</div>
+									</div>
+								</div>
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-primary" @click="edit()">保存</button>
+						</div>
+					</div>
+				</div>
+			</div>
+	</div>
+	<script type="text/javascript" th:src="@{/js/jquery-1.12.4.js}"></script>
+	<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/vue.js}"></script>
+	<script type="text/javascript">
+		var vm = new Vue({
+			el:"#ctx",
+			data(){
+				return {
+					checkValue:false,
+					page:{
+						list:[]
+					},
+					checkList:[],
+					slist:[],
+					clz:{}
+				}
+			},
+			methods:{
+				toEdit(cid){
+					$("#editModal").modal("show");
+					var that = this;
+					$.ajax({
+						url:"[[@{/toEdit}]]",
+						data:{
+							cid:cid
+						},
+						type:"post",
+						success:function(result){
+							that.clz = result;
+							that.slist = result.slist;
+							console.log(that.slist);
+						}
+					});
+				},
+				edit(){
+					var clz = this.clz;
+					var slist = this.slist;
+					clz.slist = slist;
+					clz = JSON.stringify(clz);
+					$.ajax({
+						url:"[[@{/edit}]]",
+						data:clz,
+						contentType:"application/json;charset=utf-8",
+						type:"post",
+						success:function(){
+							
+						}
+					});
+				},
+				remove(){
+					var ids = this.checkList;
+					$.ajax({
+						url:"[[@{/remove}]]",
+						data:{
+							ids:ids.join(",")
+						},
+						type:"post",
+						success:function(){
+							
+						}
+					});
+				},
+				save(){
+					var clz = this.clz;
+					var slist = this.slist;
+					clz.slist = slist;
+					clz = JSON.stringify(clz);
+					$.ajax({
+						url:"[[@{/create}]]",
+						data:clz,
+						contentType:"application/json;charset=utf-8",
+						type:"post",
+						success:function(){
+							
+						}
+					});
+				},
+				openModal(){
+					this.clz = {};
+					this.slist = [];
+					$("#createModal").modal("show");
+				},
+				createStu(){
+					this.slist.push({});
+				},
+				goPage(pageNum){
+					var that = this;
+					$.ajax({
+						url:"[[@{/ajaxFind}]]?pageSize=2&pageNum="+pageNum,
+						success:function(result){
+							that.page = result;
+						}
+					});
+				}
+			},
+			created(){
+					this.goPage(1);
+			},
+			watch:{
+				checkValue(value){
+					if(value){
+						//执行全选动作
+						this.checkList = this.page.list.map(item=>item.id);
+					}else{
+						this.checkList = [];						
+					}
+				}
+			}
+		});
+	</script>
+</body>
+</html>

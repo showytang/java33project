@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+hello world;${list}
+<div th:text="${list}"></div>
+<table>
+	<tr>
+		<td>编号</td>
+		<td>姓名</td>
+	</tr>
+	<tr th:each="item : ${list}">
+		<td th:text="${item.id}"></td>
+		<td>
+			
+			<span  th:text="${item.name}"></span>
+			<span th:if="${item.name=='残花'}">
+				白流
+			</span>
+		</td>
+	</tr>
+</table>
+</body>
+</html>
